@@ -19,47 +19,54 @@ export async function signupAction(formData: FormData) {
 
     const { firstName, lastName, email, phone, password } = validatedFields.data;
 
-    // Check if seller already exists
-    const existingSeller = await prisma.seller.findFirst({
-        where: {
-            OR: [{ email }, { phone_primary: phone }],
-        },
-    });
-
-    if (existingSeller) {
-        return { error: "Un compte avec cet email ou ce numéro de téléphone existe déjà." };
-    }
-
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    // Create seller
     try {
-        const seller = await prisma.seller.create({
-            data: {
-                email,
-                phone_primary: phone,
-                first_name: firstName,
-                last_name: lastName,
-                password_hash: passwordHash,
+        // Check if seller already exists
+        const existingSeller = await prisma.seller.findFirst({
+            where: {
+                OR: [{ email }, { phone_primary: phone }],
             },
         });
 
-        // Automatically create a shop for the seller
-        await prisma.shop.create({
-            data: {
-                seller_id: seller.id,
-                shop_name: `${firstName}'s Shop`,
-                slug: `${firstName.toLowerCase()}-${Math.floor(Math.random() * 1000)}`,
-                whatsapp_number: phone,
-            },
+        if (existingSeller) {
+            return { error: "Un compte avec cet email ou ce numéro de téléphone existe déjà." };
+        }
+
+        // Hash password
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        // Create seller and shop in a transaction
+        const seller = await prisma.$transaction(async (tx) => {
+            const newSeller = await tx.seller.create({
+                data: {
+                    email,
+                    phone_primary: phone,
+                    first_name: firstName,
+                    last_name: lastName,
+                    password_hash: passwordHash,
+                },
+            });
+
+            // Automatically create a shop for the seller
+            await tx.shop.create({
+                data: {
+                    seller_id: newSeller.id,
+                    shop_name: `${firstName}'s Shop`,
+                    slug: `${firstName.toLowerCase()}-${Math.floor(Math.random() * 1000)}`,
+                    whatsapp_number: phone,
+                },
+            });
+
+            return newSeller;
         });
 
         await login(seller);
-    } catch (e: any) {
+    } catch (e: unknown) {
+        // Check if it's a redirect error just in case code changes move redirect inside
+        if (e instanceof Error && e.message.includes("NEXT_REDIRECT")) {
+            throw e;
+        }
         console.error("Signup error:", e);
-        if (e.message?.includes("NEXT_REDIRECT")) throw e;
-        return { error: `Erreur: ${e.message || "Une erreur est survenue"}` };
+        return { error: "Une erreur est survenue lors de l'inscription." };
     }
 
     redirect("/dashboard");
@@ -75,14 +82,23 @@ export async function loginAction(formData: FormData) {
 
     const { email, password } = validatedFields.data;
 
-    const seller = await prisma.seller.findUnique({
-        where: { email },
-    });
+    try {
+        const seller = await prisma.seller.findUnique({
+            where: { email },
+        });
 
-    if (!seller || !(await bcrypt.compare(password, seller.password_hash))) {
-        return { error: "Identifiants invalides." };
+        if (!seller || !(await bcrypt.compare(password, seller.password_hash))) {
+            return { error: "Identifiants invalides." };
+        }
+
+        await login(seller);
+    } catch (e: unknown) {
+        if (e instanceof Error && e.message.includes("NEXT_REDIRECT")) {
+            throw e;
+        }
+        console.error("Login error:", e);
+        return { error: "Une erreur est survenue lors de la connexion." };
     }
 
-    await login(seller);
     redirect("/dashboard");
 }

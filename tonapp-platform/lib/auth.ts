@@ -1,11 +1,20 @@
-import { SignJWT, jwtVerify } from "jose";
+import { SignJWT, jwtVerify, JWTPayload } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const secretKey = process.env.JWT_SECRET;
+if (!secretKey) {
+  throw new Error("JWT_SECRET environment variable is not defined");
+}
 const key = new TextEncoder().encode(secretKey);
 
-export async function encrypt(payload: any) {
+interface UserPayload extends JWTPayload {
+  id: string;
+  email: string;
+  expires: Date | string | number;
+}
+
+export async function encrypt(payload: UserPayload) {
     return await new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
@@ -13,14 +22,14 @@ export async function encrypt(payload: any) {
         .sign(key);
 }
 
-export async function decrypt(input: string): Promise<any> {
+export async function decrypt(input: string): Promise<UserPayload> {
     const { payload } = await jwtVerify(input, key, {
         algorithms: ["HS256"],
     });
-    return payload;
+    return payload as UserPayload;
 }
 
-export async function login(user: any) {
+export async function login(user: { id: string; email: string }) {
     // Create the session
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
     const session = await encrypt({ id: user.id, email: user.email, expires });
