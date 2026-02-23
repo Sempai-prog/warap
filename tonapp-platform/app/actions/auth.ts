@@ -44,6 +44,11 @@ export async function signupAction(formData: FormData) {
                     last_name: lastName,
                     password_hash: passwordHash,
                 },
+                // Optimization: Select only id and email to reduce data transfer and memory usage
+                select: {
+                    id: true,
+                    email: true,
+                },
             });
 
             // Automatically create a shop for the seller
@@ -85,6 +90,12 @@ export async function loginAction(formData: FormData) {
     try {
         const seller = await prisma.seller.findUnique({
             where: { email },
+            // Optimization: Select only necessary fields for authentication to improve performance
+            select: {
+                id: true,
+                email: true,
+                password_hash: true,
+            },
         });
 
         if (!seller || !(await bcrypt.compare(password, seller.password_hash))) {
