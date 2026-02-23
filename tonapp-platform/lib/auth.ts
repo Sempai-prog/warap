@@ -36,13 +36,13 @@ export async function login(user: { id: string; email: string }) {
 
     // Save the session in a cookie
     const cookieStore = await cookies();
-    cookieStore.set("session", session, { expires, httpOnly: true });
+    cookieStore.set("session", session, { expires, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
 }
 
 export async function logout() {
     // Destroy the session
     const cookieStore = await cookies();
-    cookieStore.set("session", "", { expires: new Date(0) });
+    cookieStore.set("session", "", { expires: new Date(0), httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
 }
 
 export async function getSession() {
@@ -64,6 +64,9 @@ export async function updateSession(request: NextRequest) {
         name: "session",
         value: await encrypt(parsed),
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
         expires: parsed.expires,
     });
     return res;
