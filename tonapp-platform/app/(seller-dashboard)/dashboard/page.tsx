@@ -10,7 +10,7 @@ export default function DashboardPage() {
             Bonjour!
           </h1>
           <p className="text-small text-neutral-500">
-            Voici vos statistiques d'aujourd'hui
+            Voici vos statistiques d&apos;aujourd&apos;hui
           </p>
         </div>
         <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
@@ -27,7 +27,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-h3 font-bold">150,000</p>
-            <p className="text-[10px] mt-1 opacity-70">XAF • Aujourd'hui</p>
+            <p className="text-[10px] mt-1 opacity-70">XAF • Aujourd&apos;hui</p>
           </CardContent>
         </Card>
         <Card className="rounded-3xl border-none shadow-sm bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50">

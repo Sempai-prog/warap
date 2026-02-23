@@ -9,7 +9,7 @@ export default function ShopFrontOffice() {
             Nouveautés pour vous.
           </h2>
           <p className="text-large text-neutral-500 max-w-[80%] leading-relaxed">
-            Découvrez notre collection exclusive et profitez d'offres
+            Découvrez notre collection exclusive et profitez d&apos;offres
             exceptionnelles.
           </p>
           <div className="pt-4">
