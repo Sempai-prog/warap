@@ -52,3 +52,31 @@ export const orderSchema = z.object({
   paymentMethod: z.enum(["momo", "orange_money", "cash_on_delivery"]),
   quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
 });
+
+// Onboarding Schemas
+
+export const onboardingIdentitySchema = z.object({
+  shopName: z.string().min(2, "Le nom de la boutique doit contenir au moins 2 caractères"),
+  bio: z.string().max(500, "La bio ne peut pas dépasser 500 caractères").optional(),
+  logoUrl: z.string().url("URL du logo invalide").optional().or(z.literal("")),
+  bannerUrl: z.string().url("URL de la bannière invalide").optional().or(z.literal("")),
+});
+
+export const onboardingDesignSchema = z.object({
+  primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Code couleur invalide (ex: #3B82F6)"),
+  typographyStyle: z.enum(["inter_open_sans", "playfair_lato", "poppins_roboto"]),
+  layoutType: z.enum(["bento", "list"]),
+});
+
+export const onboardingBusinessSchema = z.object({
+  momoNumber: z.string().regex(/^\+237[0-9]{9}$/, "Numéro MoMo invalide (+237xxxxxxxxx)").optional().or(z.literal("")),
+  orangeNumber: z.string().regex(/^\+237[0-9]{9}$/, "Numéro Orange invalide (+237xxxxxxxxx)").optional().or(z.literal("")),
+  whatsappNumber: z.string().regex(/^\+237[0-9]{9}$/, "Numéro WhatsApp invalide (+237xxxxxxxxx)"),
+  acceptsCod: z.boolean().default(true),
+  deliveryZones: z.array(z.object({
+    city: z.string().min(1, "Ville requise"),
+    region: z.string().min(1, "Région requise"),
+    deliveryDays: z.coerce.number().min(0, "Jours de livraison positifs"),
+    baseFee: z.coerce.number().min(0, "Frais de base positifs").optional(),
+  })).optional(),
+});

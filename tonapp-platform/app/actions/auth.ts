@@ -74,7 +74,7 @@ export async function signupAction(formData: FormData) {
         return { error: "Une erreur est survenue lors de l'inscription." };
     }
 
-    redirect("/dashboard");
+    redirect("/onboarding");
 }
 
 export async function loginAction(formData: FormData) {
@@ -95,6 +95,11 @@ export async function loginAction(formData: FormData) {
                 id: true,
                 email: true,
                 password_hash: true,
+                shop: {
+                    select: {
+                        onboarding_completed: true
+                    }
+                }
             },
         });
 
@@ -102,7 +107,13 @@ export async function loginAction(formData: FormData) {
             return { error: "Identifiants invalides." };
         }
 
-        await login(seller);
+        // We need to pass id and email to login function, but seller object might have more or less fields based on select
+        // Ensure we pass exactly what's needed
+        await login({ id: seller.id, email: seller.email });
+
+        if (seller.shop && !seller.shop.onboarding_completed) {
+            redirect("/onboarding");
+        }
     } catch (e: unknown) {
         if (e instanceof Error && e.message.includes("NEXT_REDIRECT")) {
             throw e;

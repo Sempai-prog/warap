@@ -59,6 +59,7 @@ model Shop {
   secondary_contacts  String?   
   social_links        String?   
   accepts_cash_on_delivery Boolean @default(true)
+  onboarding_completed Boolean @default(false)
   delivery_zones      String     @default("[]")
   view_count          Int      @default(0)
   total_sales         BigInt   @default(0)
