@@ -1,0 +1,236 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+
+enum VerificationStatus {
+  unverified
+  email_verified
+  phone_verified
+  fully_verified
+}
+
+enum FulfillmentStatus {
+  new
+  preparing
+  in_delivery
+  delivered
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  confirmed
+  failed
+  refunded
+}
+
+enum ProductStatus {
+  draft
+  published
+  out_of_stock
+  archived
+}
+
+// Models
+
+model Seller {
+  id                  String   @id @default(uuid()) @db.Uuid
+  email               String   @unique @db.VarChar(255)
+  password_hash       String   @db.VarChar(255)
+  phone_primary       String   @unique @db.VarChar(20)
+  first_name          String   @db.VarChar(100)
+  last_name           String   @db.VarChar(100)
+  avatar_url          String?  @db.Text
+  verification_status VerificationStatus @default(unverified)
+  is_active           Boolean  @default(true)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  last_login          DateTime?
+
+  // Relations
+  shop                    Shop?
+  email_verification_tokens EmailVerificationToken[]
+  phone_verification_otps   PhoneVerificationOtp[]
+
+  @@map("sellers")
+}
+
+model Shop {
+  id                  String   @id @default(uuid()) @db.Uuid
+  seller_id           String   @unique @db.Uuid
+  shop_name           String   @db.VarChar(100)
+  slug                String   @unique @db.VarChar(100)
+  bio_description     String?  @db.Text
+  logo_url            String?  @db.Text
+  banner_url          String?  @db.Text
+  primary_color       String   @default("#3B82F6") @db.VarChar(7)
+  secondary_color     String?  @db.VarChar(7)
+  typography_style    String   @default("inter_open_sans") @db.VarChar(50)
+  layout_type         String   @default("bento") @db.VarChar(50)
+  layout_bento_config Json?    @db.JsonB
+  momo_number         String?  @db.VarChar(20)
+  orange_money_number String?  @db.VarChar(20)
+  whatsapp_number     String   @db.VarChar(20)
+  secondary_contacts  Json?    @db.JsonB
+  social_links        Json?    @db.JsonB
+  accepts_cash_on_delivery Boolean @default(true)
+  delivery_zones      Json     @default("[]") @db.JsonB
+  view_count          Int      @default(0)
+  total_sales         BigInt   @default(0)
+  is_published        Boolean  @default(false)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  // Relations
+  seller     Seller     @relation(fields: [seller_id], references: [id])
+  categories Category[]
+  products   Product[]
+  orders     Order[]
+
+  @@map("shops")
+}
+
+model Category {
+  id            String   @id @default(uuid()) @db.Uuid
+  shop_id       String   @db.Uuid
+  name          String   @db.VarChar(100)
+  slug          String   @db.VarChar(100)
+  description   String?  @db.Text
+  icon_emoji    String?  @db.VarChar(10)
+  display_order Int      @default(0)
+  is_active     Boolean  @default(true)
+  product_count Int      @default(0)
+  created_at    DateTime @default(now())
+
+  // Relations
+  shop     Shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([shop_id, slug])
+  @@index([shop_id, display_order])
+  @@map("categories")
+}
+
+model Product {
+  id                    String   @id @default(uuid()) @db.Uuid
+  shop_id               String   @db.Uuid
+  category_id           String?  @db.Uuid
+  title                 String   @db.VarChar(255)
+  description           String   @db.Text
+  price_xaf             BigInt
+  stock_quantity        Int      @default(0)
+  is_in_stock           Boolean  @default(true)
+  image_primary_url     String   @db.Text
+  images_secondary_urls Json?    @default("[]") @db.JsonB
+  magic_link_slug       String?  @unique @db.VarChar(15)
+  keywords              Json?    @db.JsonB
+  status                ProductStatus @default(draft)
+  ai_generated          Boolean  @default(true)
+  view_count            Int      @default(0)
+  conversion_count      Int      @default(0)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  // Relations
+  shop     Shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  orders   Order[]
+
+  @@index([shop_id, status])
+  @@index([shop_id, created_at(sort: Desc)])
+  @@index([keywords], type: Gin)
+  @@map("products")
+}
+
+model Order {
+  id                     String   @id @default(uuid()) @db.Uuid
+  shop_id                String   @db.Uuid
+  product_id             String   @db.Uuid
+  customer_name          String   @db.VarChar(100)
+  customer_phone         String   @db.VarChar(20)
+  delivery_address       String   @db.VarChar(255)
+  special_instructions   String?  @db.Text
+  quantity               Int      @default(1)
+  unit_price_xaf         BigInt
+  total_amount_xaf       BigInt
+  delivery_fee_xaf       BigInt   @default(0)
+  payment_method         String   @db.VarChar(50)
+  payment_status         PaymentStatus @default(pending)
+  payment_transaction_id String?  @db.VarChar(255)
+  fulfillment_status     FulfillmentStatus @default(new)
+  seller_notes           String?  @db.Text
+  refund_reason          String?  @db.Text
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+  delivered_at           DateTime?
+
+  // Relations
+  shop     Shop    @relation(fields: [shop_id], references: [id], onDelete: Restrict)
+  product  Product @relation(fields: [product_id], references: [id], onDelete: Restrict)
+  webhooks PaymentProviderWebhook[]
+
+  @@index([shop_id, created_at(sort: Desc)])
+  @@index([payment_status])
+  @@index([fulfillment_status])
+  @@index([shop_id, fulfillment_status])
+  @@index([payment_transaction_id])
+  @@index([customer_phone])
+  @@map("orders")
+}
+
+model PaymentProviderWebhook {
+  id                String   @id @default(uuid()) @db.Uuid
+  webhook_signature String   @db.VarChar(255)
+  payload_json      Json     @db.JsonB
+  order_id          String?  @db.Uuid
+  status            String   @default("received") @db.VarChar(50)
+  error_message     String?  @db.Text
+  received_at       DateTime @default(now())
+  processed_at      DateTime?
+
+  // Relations
+  order Order? @relation(fields: [order_id], references: [id], onDelete: SetNull)
+
+  @@index([webhook_signature])
+  @@index([order_id])
+  @@index([received_at(sort: Desc)])
+  @@map("payment_providers_webhooks")
+}
+
+model EmailVerificationToken {
+  id         String   @id @default(uuid()) @db.Uuid
+  seller_id  String   @db.Uuid
+  token      String   @unique @db.VarChar(255)
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  // Relations
+  seller Seller @relation(fields: [seller_id], references: [id])
+
+  @@map("email_verification_tokens")
+}
+
+model PhoneVerificationOtp {
+  id           String   @id @default(uuid()) @db.Uuid
+  seller_id    String   @db.Uuid
+  phone_number String   @db.VarChar(20)
+  otp_code     String   @db.VarChar(6)
+  attempts     Int      @default(0)
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+
+  // Relations
+  seller Seller @relation(fields: [seller_id], references: [id])
+
+  @@map("phone_verification_otps")
+}
