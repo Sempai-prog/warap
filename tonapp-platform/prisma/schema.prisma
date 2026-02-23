@@ -6,52 +6,27 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // Enums
 
-enum VerificationStatus {
-  unverified
-  email_verified
-  phone_verified
-  fully_verified
-}
 
-enum FulfillmentStatus {
-  new
-  preparing
-  in_delivery
-  delivered
-  cancelled
-}
 
-enum PaymentStatus {
-  pending
-  confirmed
-  failed
-  refunded
-}
 
-enum ProductStatus {
-  draft
-  published
-  out_of_stock
-  archived
-}
 
 // Models
 
 model Seller {
-  id                  String   @id @default(uuid()) @db.Uuid
-  email               String   @unique @db.VarChar(255)
-  password_hash       String   @db.VarChar(255)
-  phone_primary       String   @unique @db.VarChar(20)
-  first_name          String   @db.VarChar(100)
-  last_name           String   @db.VarChar(100)
-  avatar_url          String?  @db.Text
-  verification_status VerificationStatus @default(unverified)
+  id                  String   @id @default(uuid())
+  email               String   @unique
+  password_hash       String  
+  phone_primary       String   @unique
+  first_name          String  
+  last_name           String  
+  avatar_url          String? 
+  verification_status String @default("unverified")
   is_active           Boolean  @default(true)
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
@@ -66,25 +41,25 @@ model Seller {
 }
 
 model Shop {
-  id                  String   @id @default(uuid()) @db.Uuid
-  seller_id           String   @unique @db.Uuid
-  shop_name           String   @db.VarChar(100)
-  slug                String   @unique @db.VarChar(100)
-  bio_description     String?  @db.Text
-  logo_url            String?  @db.Text
-  banner_url          String?  @db.Text
-  primary_color       String   @default("#3B82F6") @db.VarChar(7)
-  secondary_color     String?  @db.VarChar(7)
-  typography_style    String   @default("inter_open_sans") @db.VarChar(50)
-  layout_type         String   @default("bento") @db.VarChar(50)
-  layout_bento_config Json?    @db.JsonB
-  momo_number         String?  @db.VarChar(20)
-  orange_money_number String?  @db.VarChar(20)
-  whatsapp_number     String   @db.VarChar(20)
-  secondary_contacts  Json?    @db.JsonB
-  social_links        Json?    @db.JsonB
+  id                  String   @id @default(uuid())
+  seller_id           String   @unique
+  shop_name           String  
+  slug                String   @unique
+  bio_description     String? 
+  logo_url            String? 
+  banner_url          String? 
+  primary_color       String   @default("#00A86B")
+  secondary_color     String? 
+  typography_style    String   @default("inter_open_sans")
+  layout_type         String   @default("bento")
+  layout_bento_config String?   
+  momo_number         String? 
+  orange_money_number String? 
+  whatsapp_number     String  
+  secondary_contacts  String?   
+  social_links        String?   
   accepts_cash_on_delivery Boolean @default(true)
-  delivery_zones      Json     @default("[]") @db.JsonB
+  delivery_zones      String     @default("[]")
   view_count          Int      @default(0)
   total_sales         BigInt   @default(0)
   is_published        Boolean  @default(false)
@@ -101,12 +76,12 @@ model Shop {
 }
 
 model Category {
-  id            String   @id @default(uuid()) @db.Uuid
-  shop_id       String   @db.Uuid
-  name          String   @db.VarChar(100)
-  slug          String   @db.VarChar(100)
-  description   String?  @db.Text
-  icon_emoji    String?  @db.VarChar(10)
+  id            String   @id @default(uuid())
+  shop_id       String  
+  name          String  
+  slug          String  
+  description   String? 
+  icon_emoji    String? 
   display_order Int      @default(0)
   is_active     Boolean  @default(true)
   product_count Int      @default(0)
@@ -122,19 +97,19 @@ model Category {
 }
 
 model Product {
-  id                    String   @id @default(uuid()) @db.Uuid
-  shop_id               String   @db.Uuid
-  category_id           String?  @db.Uuid
-  title                 String   @db.VarChar(255)
-  description           String   @db.Text
+  id                    String   @id @default(uuid())
+  shop_id               String  
+  category_id           String? 
+  title                 String  
+  description           String  
   price_xaf             BigInt
   stock_quantity        Int      @default(0)
   is_in_stock           Boolean  @default(true)
-  image_primary_url     String   @db.Text
-  images_secondary_urls Json?    @default("[]") @db.JsonB
-  magic_link_slug       String?  @unique @db.VarChar(15)
-  keywords              Json?    @db.JsonB
-  status                ProductStatus @default(draft)
+  image_primary_url     String  
+  images_secondary_urls String?    @default("[]")
+  magic_link_slug       String?  @unique
+  keywords              String?   
+  status                String @default("draft")
   ai_generated          Boolean  @default(true)
   view_count            Int      @default(0)
   conversion_count      Int      @default(0)
@@ -148,28 +123,28 @@ model Product {
 
   @@index([shop_id, status])
   @@index([shop_id, created_at(sort: Desc)])
-  @@index([keywords], type: Gin)
+  // @@index([keywords], type: Gin)
   @@map("products")
 }
 
 model Order {
-  id                     String   @id @default(uuid()) @db.Uuid
-  shop_id                String   @db.Uuid
-  product_id             String   @db.Uuid
-  customer_name          String   @db.VarChar(100)
-  customer_phone         String   @db.VarChar(20)
-  delivery_address       String   @db.VarChar(255)
-  special_instructions   String?  @db.Text
+  id                     String   @id @default(uuid())
+  shop_id                String  
+  product_id             String  
+  customer_name          String  
+  customer_phone         String  
+  delivery_address       String  
+  special_instructions   String? 
   quantity               Int      @default(1)
   unit_price_xaf         BigInt
   total_amount_xaf       BigInt
   delivery_fee_xaf       BigInt   @default(0)
-  payment_method         String   @db.VarChar(50)
-  payment_status         PaymentStatus @default(pending)
-  payment_transaction_id String?  @db.VarChar(255)
-  fulfillment_status     FulfillmentStatus @default(new)
-  seller_notes           String?  @db.Text
-  refund_reason          String?  @db.Text
+  payment_method         String  
+  payment_status         String @default("pending")
+  payment_transaction_id String? 
+  fulfillment_status     String @default("new")
+  seller_notes           String? 
+  refund_reason          String? 
   created_at             DateTime @default(now())
   updated_at             DateTime @updatedAt
   delivered_at           DateTime?
@@ -189,12 +164,12 @@ model Order {
 }
 
 model PaymentProviderWebhook {
-  id                String   @id @default(uuid()) @db.Uuid
-  webhook_signature String   @db.VarChar(255)
-  payload_json      Json     @db.JsonB
-  order_id          String?  @db.Uuid
-  status            String   @default("received") @db.VarChar(50)
-  error_message     String?  @db.Text
+  id                String   @id @default(uuid())
+  webhook_signature String  
+  payload_json      String    
+  order_id          String? 
+  status            String   @default("received")
+  error_message     String? 
   received_at       DateTime @default(now())
   processed_at      DateTime?
 
@@ -208,9 +183,9 @@ model PaymentProviderWebhook {
 }
 
 model EmailVerificationToken {
-  id         String   @id @default(uuid()) @db.Uuid
-  seller_id  String   @db.Uuid
-  token      String   @unique @db.VarChar(255)
+  id         String   @id @default(uuid())
+  seller_id  String  
+  token      String   @unique
   expires_at DateTime
   created_at DateTime @default(now())
 
@@ -221,10 +196,10 @@ model EmailVerificationToken {
 }
 
 model PhoneVerificationOtp {
-  id           String   @id @default(uuid()) @db.Uuid
-  seller_id    String   @db.Uuid
-  phone_number String   @db.VarChar(20)
-  otp_code     String   @db.VarChar(6)
+  id           String   @id @default(uuid())
+  seller_id    String  
+  phone_number String  
+  otp_code     String  
   attempts     Int      @default(0)
   expires_at   DateTime
   created_at   DateTime @default(now())
