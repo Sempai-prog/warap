@@ -75,7 +75,7 @@ export async function updateBusinessAction(formData: FormData) {
   const session = await getSession();
   if (!session) return { error: "Non autorisé" };
 
-  const rawValues: any = Object.fromEntries(formData.entries());
+  const rawValues: Record<string, FormDataEntryValue> = Object.fromEntries(formData.entries());
 
   // Handle checkbox (it's "on" if checked, missing if not)
   // But wait, if it's controlled by React Hook Form and sent via FormData,

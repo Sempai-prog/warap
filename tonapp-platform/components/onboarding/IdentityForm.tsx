@@ -51,7 +51,7 @@ export function IdentityForm({ onNext }: { onNext: () => void }) {
     }
   }
 
-  const handleMockUpload = (field: any, type: 'logo' | 'banner') => {
+  const handleMockUpload = (field: { onChange: (value: string) => void }, type: 'logo' | 'banner') => {
     const url = type === 'logo'
         ? "https://placehold.co/400x400/png?text=Logo"
         : "https://placehold.co/800x200/png?text=Banniere";
