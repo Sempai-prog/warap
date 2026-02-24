@@ -17,8 +17,9 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { z } from "zod";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, CreditCard } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 type BusinessValues = z.infer<typeof onboardingBusinessSchema>;
 
@@ -26,7 +27,7 @@ export function BusinessForm({ onBack }: { onBack: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<BusinessValues>({
+  const form = useForm<any>({
     resolver: zodResolver(onboardingBusinessSchema),
     defaultValues: {
       momoNumber: "",

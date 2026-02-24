@@ -30,13 +30,23 @@ import { SuccessScreen } from "./SuccessScreen";
 type OrderValues = z.infer<typeof orderSchema>;
 
 interface CheckoutSheetProps {
-  product: { id: string; title: string; price_xaf: bigint; shop: { accepts_cash_on_delivery: boolean } };
+  product: {
+    id: string;
+    title: string;
+    price_xaf: bigint;
+    shop: { accepts_cash_on_delivery: boolean };
+  };
 }
 
 export function CheckoutSheet({ product }: CheckoutSheetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [successData, setSuccessData] = useState<{ orderId: string; product: { title: string; price_xaf: bigint; shop: { whatsapp_number: string } }; deliveryAddress: string; quantity: number } | null>(null);
+  const [successData, setSuccessData] = useState<{
+    orderId: string;
+    product: { title: string; price_xaf: bigint; shop: any };
+    deliveryAddress: string;
+    quantity: number;
+  } | null>(null);
 
   const form = useForm<OrderValues>({
     resolver: zodResolver(orderSchema),
@@ -52,7 +62,9 @@ export function CheckoutSheet({ product }: CheckoutSheetProps) {
   async function onSubmit(values: OrderValues) {
     setIsLoading(true);
     const formData = new FormData();
-    Object.entries(values).forEach(([key, value]) => formData.append(key, String(value)));
+    Object.entries(values).forEach(([key, value]) =>
+      formData.append(key, String(value)),
+    );
     formData.append("productId", product.id);
 
     try {
@@ -73,12 +85,15 @@ export function CheckoutSheet({ product }: CheckoutSheetProps) {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-            <Button className="w-full h-14 rounded-full text-lg font-bold shadow-xl bg-primary-600 hover:bg-primary-700 active:scale-95 transition-all">
-                Acheter Maintenant
-            </Button>
+          <Button className="w-full h-14 rounded-full text-lg font-bold shadow-xl bg-primary-600 hover:bg-primary-700 active:scale-95 transition-all">
+            Acheter Maintenant
+          </Button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-[2rem] p-0 min-h-[90vh]">
-            <SuccessScreen data={successData} onClose={() => setIsOpen(false)} />
+        <SheetContent
+          side="bottom"
+          className="rounded-t-[2rem] p-0 min-h-[90vh]"
+        >
+          <SuccessScreen data={successData} onClose={() => setIsOpen(false)} />
         </SheetContent>
       </Sheet>
     );
@@ -91,20 +106,30 @@ export function CheckoutSheet({ product }: CheckoutSheetProps) {
           Acheter Maintenant
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-[2rem] px-6 py-8 max-h-[90vh] overflow-y-auto">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-[2rem] px-6 py-8 max-h-[90vh] overflow-y-auto"
+      >
         <SheetHeader className="mb-6 text-left">
-          <SheetTitle className="text-2xl font-bold">Finaliser votre commande</SheetTitle>
+          <SheetTitle className="text-2xl font-bold">
+            Finaliser votre commande
+          </SheetTitle>
         </SheetHeader>
 
         {/* Order Summary */}
         <div className="bg-neutral-50 p-4 rounded-xl mb-6 flex gap-4 border border-neutral-100">
-            <div className="h-16 w-16 bg-neutral-200 rounded-lg flex-shrink-0 relative overflow-hidden">
-                 {/* Image would go here */}
-            </div>
-            <div>
-                <p className="font-semibold line-clamp-1">{product.title}</p>
-                <p className="text-sm text-neutral-500">Total: <span className="font-bold text-neutral-900">{Number(product.price_xaf).toLocaleString()} XAF</span></p>
-            </div>
+          <div className="h-16 w-16 bg-neutral-200 rounded-lg flex-shrink-0 relative overflow-hidden">
+            {/* Image would go here */}
+          </div>
+          <div>
+            <p className="font-semibold line-clamp-1">{product.title}</p>
+            <p className="text-sm text-neutral-500">
+              Total:{" "}
+              <span className="font-bold text-neutral-900">
+                {Number(product.price_xaf).toLocaleString()} XAF
+              </span>
+            </p>
+          </div>
         </div>
 
         <Form {...form}>
@@ -116,7 +141,11 @@ export function CheckoutSheet({ product }: CheckoutSheetProps) {
                 <FormItem>
                   <FormLabel>Votre Nom</FormLabel>
                   <FormControl>
-                    <Input placeholder="Jean Dupont" {...field} className="rounded-xl h-12" />
+                    <Input
+                      placeholder="Jean Dupont"
+                      {...field}
+                      className="rounded-xl h-12"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -129,7 +158,11 @@ export function CheckoutSheet({ product }: CheckoutSheetProps) {
                 <FormItem>
                   <FormLabel>Numéro de Téléphone</FormLabel>
                   <FormControl>
-                    <Input placeholder="+237..." {...field} className="rounded-xl h-12" />
+                    <Input
+                      placeholder="+237..."
+                      {...field}
+                      className="rounded-xl h-12"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -142,7 +175,11 @@ export function CheckoutSheet({ product }: CheckoutSheetProps) {
                 <FormItem>
                   <FormLabel>Quartier de Livraison</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Douala - Akwa" {...field} className="rounded-xl h-12" />
+                    <Input
+                      placeholder="Ex: Douala - Akwa"
+                      {...field}
+                      className="rounded-xl h-12"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -181,13 +218,13 @@ export function CheckoutSheet({ product }: CheckoutSheetProps) {
                       </FormItem>
                       {product.shop.accepts_cash_on_delivery && (
                         <FormItem className="flex items-center space-x-3 space-y-0 rounded-xl border p-4">
-                            <FormControl>
+                          <FormControl>
                             <RadioGroupItem value="cash_on_delivery" />
-                            </FormControl>
-                            <FormLabel className="font-normal flex-1 cursor-pointer">
+                          </FormControl>
+                          <FormLabel className="font-normal flex-1 cursor-pointer">
                             Paiement à la livraison
-                            </FormLabel>
-                            <span className="text-xl">💵</span>
+                          </FormLabel>
+                          <span className="text-xl">💵</span>
                         </FormItem>
                       )}
                     </RadioGroup>
@@ -197,8 +234,16 @@ export function CheckoutSheet({ product }: CheckoutSheetProps) {
               )}
             />
 
-            <Button type="submit" className="w-full h-14 rounded-xl text-lg font-bold mt-4" disabled={isLoading}>
-              {isLoading ? <Loader2 className="animate-spin" /> : "Confirmer la commande"}
+            <Button
+              type="submit"
+              className="w-full h-14 rounded-xl text-lg font-bold mt-4"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                "Confirmer la commande"
+              )}
             </Button>
           </form>
         </Form>

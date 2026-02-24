@@ -88,7 +88,7 @@ export function ProductForm({
           setCreatedProduct({
             title: values.title,
             price_xaf: BigInt(values.price),
-            magic_link_slug: result.slug || "demo-slug",
+            magic_link_slug: (result as any).slug || "demo-slug",
           });
           setShowShareModal(true);
         } else {

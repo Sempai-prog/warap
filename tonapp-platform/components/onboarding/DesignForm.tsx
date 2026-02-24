@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
+import { cn } from "@/lib/utils";
 
 type DesignValues = z.infer<typeof onboardingDesignSchema>;
 
