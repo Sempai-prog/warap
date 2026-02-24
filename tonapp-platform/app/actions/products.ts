@@ -80,7 +80,7 @@ export async function createProductAction(formData: FormData) {
     });
 
     revalidatePath("/products");
-    return { success: true, id: product.id };
+    return { success: true, id: product.id, slug: product.magic_link_slug };
   } catch (error) {
     console.error("Create Product Error:", error);
     return { error: "Erreur lors de la création" };
