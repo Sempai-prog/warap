@@ -43,7 +43,7 @@ export default async function ProductsPage() {
             </p>
           </div>
         ) : (
-          products.map((product) => (
+          products.map((product: any) => (
             <MotionItem
               key={product.id}
               className="group relative flex flex-col bg-white rounded-[2.5rem] border border-white/60 shadow-soft hover:shadow-soft-lg transition-all duration-300"

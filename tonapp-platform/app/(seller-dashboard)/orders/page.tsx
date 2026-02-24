@@ -58,7 +58,7 @@ export default async function OrdersPage({
             Aucune commande dans cet onglet.
           </div>
         ) : (
-          orders.map((order) => (
+          orders.map((order: any) => (
             <MotionItem key={order.id}>
               <Link href={`/orders/${order.id}`}>
                 <div className="group p-6 bg-white rounded-[2.5rem] border border-white/60 shadow-soft hover:shadow-soft-lg active:scale-[0.99] transition-all relative overflow-hidden">
