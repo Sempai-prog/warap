@@ -1,4 +1,3 @@
-```
 import { getOrders } from "@/app/actions/orders";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
