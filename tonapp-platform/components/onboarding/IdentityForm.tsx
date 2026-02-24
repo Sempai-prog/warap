@@ -7,7 +7,14 @@ import { onboardingIdentitySchema } from "@/lib/validations";
 import { updateIdentityAction } from "@/app/actions/onboarding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { z } from "zod";
 
 type IdentityValues = z.infer<typeof onboardingIdentitySchema>;
@@ -39,7 +46,7 @@ export function IdentityForm({ onNext }: { onNext: () => void }) {
       if (result?.error) {
         setError(result.error);
         if (result.details) {
-            console.error(result.details);
+          console.error(result.details);
         }
       } else {
         onNext();
@@ -51,8 +58,12 @@ export function IdentityForm({ onNext }: { onNext: () => void }) {
     }
   }
 
-  const handleMockUpload = (field: { onChange: (value: string) => void }, type: 'logo' | 'banner') => {
-    const url = type === 'logo'
+  const handleMockUpload = (
+    field: { onChange: (value: string) => void },
+    type: "logo" | "banner",
+  ) => {
+    const url =
+      type === "logo"
         ? "https://placehold.co/400x400/png?text=Logo"
         : "https://placehold.co/800x200/png?text=Banniere";
 
@@ -68,95 +79,136 @@ export function IdentityForm({ onNext }: { onNext: () => void }) {
           control={form.control}
           name="shopName"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nom de la boutique</FormLabel>
+            <FormItem className="space-y-2">
+              <FormLabel className="text-small font-bold uppercase tracking-wider text-neutral-400">
+                Nom de la boutique
+              </FormLabel>
               <FormControl>
-                <Input placeholder="Ma Boutique" {...field} className="rounded-xl" />
+                <Input
+                  placeholder="Ma Boutique"
+                  {...field}
+                  className="rounded-2xl border-neutral-100 bg-neutral-50/50 h-14 selection:bg-primary/20"
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-tiny font-medium" />
             </FormItem>
           )}
         />
 
         <FormField
-            control={form.control}
-            name="bio"
-            render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Bio</FormLabel>
-                    <FormControl>
-                        <textarea
-                            className="flex min-h-[80px] w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            placeholder="Une courte description..."
-                            {...field}
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                        />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            )}
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel className="text-small font-bold uppercase tracking-wider text-neutral-400">
+                Bio
+              </FormLabel>
+              <FormControl>
+                <textarea
+                  className="flex min-h-[120px] w-full rounded-[2rem] border border-neutral-100 bg-neutral-50/50 px-4 py-3 text-sm ring-offset-background placeholder:text-neutral-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all font-medium"
+                  placeholder="Une courte description..."
+                  {...field}
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage className="text-tiny font-medium" />
+            </FormItem>
+          )}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="logoUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Logo</FormLabel>
-                  <FormControl>
-                    <div className="flex flex-col gap-3 items-center p-4 border rounded-xl border-dashed border-neutral-200 dark:border-neutral-800">
-                        {field.value ? (
-                            <img src={field.value} className="w-20 h-20 rounded-full object-cover shadow-sm bg-neutral-100" alt="Logo Preview" />
-                        ) : (
-                            <div className="w-20 h-20 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400">
-                                <span className="text-2xl">📷</span>
-                            </div>
-                        )}
-                        <Button type="button" variant="outline" size="sm" onClick={() => handleMockUpload(field, 'logo')}>
-                            {field.value ? "Changer" : "Ajouter Logo"}
-                        </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="bannerUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bannière</FormLabel>
-                  <FormControl>
-                    <div className="flex flex-col gap-3 items-center p-4 border rounded-xl border-dashed border-neutral-200 dark:border-neutral-800">
-                        {field.value ? (
-                            <img src={field.value} className="w-full h-20 rounded-lg object-cover shadow-sm bg-neutral-100" alt="Banner Preview" />
-                        ) : (
-                            <div className="w-full h-20 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400">
-                                <span className="text-2xl">🖼️</span>
-                            </div>
-                        )}
-                        <Button type="button" variant="outline" size="sm" onClick={() => handleMockUpload(field, 'banner')}>
-                            {field.value ? "Changer" : "Ajouter Bannière"}
-                        </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="logoUrl"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-small font-bold uppercase tracking-wider text-neutral-400">
+                  Logo
+                </FormLabel>
+                <FormControl>
+                  <div className="flex flex-col gap-4 items-center p-6 bg-white rounded-[2.5rem] shadow-soft border border-white/60">
+                    {field.value ? (
+                      <img
+                        src={field.value}
+                        className="w-24 h-24 rounded-full object-cover shadow-soft bg-neutral-50 ring-4 ring-white"
+                        alt="Logo Preview"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-200 border-2 border-dashed border-neutral-100">
+                        <span className="text-3xl">📷</span>
+                      </div>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10 rounded-xl px-4 font-bold border-neutral-100 hover:bg-neutral-50"
+                      onClick={() => handleMockUpload(field, "logo")}
+                    >
+                      {field.value ? "Changer" : "Ajouter Logo"}
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage className="text-tiny font-medium" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="bannerUrl"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-small font-bold uppercase tracking-wider text-neutral-400">
+                  Bannière
+                </FormLabel>
+                <FormControl>
+                  <div className="flex flex-col gap-4 items-center p-6 bg-white rounded-[2.5rem] shadow-soft border border-white/60">
+                    {field.value ? (
+                      <img
+                        src={field.value}
+                        className="w-full h-24 rounded-[1.5rem] object-cover shadow-soft bg-neutral-50 ring-4 ring-white"
+                        alt="Banner Preview"
+                      />
+                    ) : (
+                      <div className="w-full h-24 rounded-[1.5rem] bg-neutral-50 flex items-center justify-center text-neutral-200 border-2 border-dashed border-neutral-100">
+                        <span className="text-3xl">🖼️</span>
+                      </div>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10 rounded-xl px-4 font-bold border-neutral-100 hover:bg-neutral-50"
+                      onClick={() => handleMockUpload(field, "banner")}
+                    >
+                      {field.value ? "Changer" : "Ajouter Bannière"}
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage className="text-tiny font-medium" />
+              </FormItem>
+            )}
+          />
         </div>
 
         {error && (
-            <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm font-medium border border-red-100">
-                {error}
-            </div>
+          <div className="p-4 rounded-2xl bg-red-50 text-red-600 text-sm font-bold border border-red-100 animate-in zoom-in-95">
+            {error}
+          </div>
         )}
 
-        <Button type="submit" className="w-full h-12 rounded-xl text-base font-bold" disabled={isLoading}>
-          {isLoading ? "Enregistrement..." : "Continuer"}
+        <Button
+          type="submit"
+          className="w-full h-16 rounded-[2rem] text-lg font-bold shadow-soft-xl bg-neutral-900 hover:bg-neutral-800 text-white transition-all active:scale-[0.98]"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Enregistrement...
+            </div>
+          ) : (
+            "Enregistrer les modifications"
+          )}
         </Button>
       </form>
     </Form>

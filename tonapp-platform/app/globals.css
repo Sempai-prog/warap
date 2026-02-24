@@ -55,16 +55,16 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* RDP Typography Scale */
+  /* RDP Typography Scale (Fluid w/ clamp) */
   --font-size-tiny: 10px;
   --font-size-small: 12px;
-  --font-size-base: 14px;
-  --font-size-large: 16px;
-  --font-size-xl: 18px;
-  --font-size-xxl: 20px;
-  --font-size-h3: 24px;
-  --font-size-h2: 32px;
-  --font-size-h1: 48px;
+  --font-size-base: clamp(0.875rem, 1vw, 1rem); /* 14px-16px */
+  --font-size-large: clamp(1rem, 1.2vw, 1.125rem);
+  --font-size-xl: clamp(1.125rem, 1.5vw, 1.25rem);
+  --font-size-xxl: clamp(1.25rem, 2vw, 1.5rem);
+  --font-size-h3: clamp(1.5rem, 3vw, 2rem);
+  --font-size-h2: clamp(2rem, 4vw, 2.5rem);
+  --font-size-h1: clamp(2.5rem, 6vw, 4rem);
 
   /* RDP Spacing (8px grid) */
   --spacing-gu-0-5: 4px;
@@ -78,6 +78,22 @@
 
   /* Radius (Large & Friendly) */
   --radius-3xl: 1.5rem; /* ~24px */
+  --radius-4xl: 2rem;   /* ~32px */
+  --radius-5xl: 3rem;   /* ~48px */
+
+  /* Soft UI / Neumorphism Tokens */
+  --color-soft-bg: #f2f4f7;
+  --color-mint-card: #e0f4ee;
+  --color-mint-text: #2a9d8f;
+  --color-blue-card: #ebf5ff;
+  --color-blue-text: #3182ce;
+  --color-purple-card: #f5f3ff;
+  --color-purple-text: #7c3aed;
+
+  /* Shadows */
+  --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.03);
+  --shadow-soft-lg: 0 20px 60px rgba(0, 0, 0, 0.06);
+  --shadow-soft-xl: 0 25px 80px rgba(0, 0, 0, 0.08);
 }
 
 :root {

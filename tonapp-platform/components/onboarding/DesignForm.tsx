@@ -6,7 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { onboardingDesignSchema } from "@/lib/validations";
 import { updateDesignAction } from "@/app/actions/onboarding";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { z } from "zod";
 
 type DesignValues = z.infer<typeof onboardingDesignSchema>;
@@ -26,7 +33,13 @@ const FONTS = [
   { id: "poppins_roboto", name: "Audacieux (Poppins + Roboto)" },
 ] as const;
 
-export function DesignForm({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+export function DesignForm({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +56,9 @@ export function DesignForm({ onNext, onBack }: { onNext: () => void; onBack: () 
     setIsLoading(true);
     setError(null);
     const formData = new FormData();
-    Object.entries(values).forEach(([key, value]) => formData.append(key, value));
+    Object.entries(values).forEach(([key, value]) =>
+      formData.append(key, value),
+    );
 
     try {
       const result = await updateDesignAction(formData);
@@ -68,29 +83,40 @@ export function DesignForm({ onNext, onBack }: { onNext: () => void; onBack: () 
           control={form.control}
           name="primaryColor"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold">Couleur Principale</FormLabel>
+            <FormItem className="space-y-4">
+              <FormLabel className="text-small font-bold uppercase tracking-wider text-neutral-400">
+                Couleur de la marque
+              </FormLabel>
               <FormControl>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-4 flex-wrap p-6 bg-white rounded-[2.5rem] shadow-soft border border-white/60">
                   {COLORS.map((color) => (
                     <button
                       key={color.hex}
                       type="button"
-                      className={`w-12 h-12 rounded-full cursor-pointer transition-all hover:scale-110 flex items-center justify-center ring-offset-2 ${
-                        field.value === color.hex ? "ring-2 ring-neutral-900 dark:ring-white scale-110" : "ring-1 ring-transparent hover:ring-neutral-200"
+                      className={`w-14 h-14 rounded-2xl cursor-pointer transition-all hover:scale-110 flex items-center justify-center ring-offset-4 ${
+                        field.value === color.hex
+                          ? "ring-2 ring-primary scale-110 shadow-soft-lg"
+                          : "ring-1 ring-neutral-100 hover:ring-neutral-200"
                       }`}
                       style={{ backgroundColor: color.hex }}
                       onClick={() => field.onChange(color.hex)}
                       aria-label={`Select color ${color.name}`}
                     >
                       {field.value === color.hex && (
-                        <span className="text-white font-bold drop-shadow-md">✓</span>
+                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm">
+                          <span className="text-primary font-bold text-xs">
+                            ✓
+                          </span>
+                        </div>
                       )}
                     </button>
                   ))}
+                  <div className="w-14 h-14 rounded-2xl bg-neutral-50 border-2 border-dashed border-neutral-100 flex items-center justify-center text-neutral-300">
+                    <span className="text-xl">+</span>
+                  </div>
                 </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-tiny font-medium" />
             </FormItem>
           )}
         />
@@ -100,28 +126,45 @@ export function DesignForm({ onNext, onBack }: { onNext: () => void; onBack: () 
           control={form.control}
           name="typographyStyle"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold">Style Typographique</FormLabel>
+            <FormItem className="space-y-4">
+              <FormLabel className="text-small font-bold uppercase tracking-wider text-neutral-400">
+                Style Typographique
+              </FormLabel>
               <FormControl>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-4">
                   {FONTS.map((font) => (
                     <button
                       key={font.id}
                       type="button"
-                      className={`flex items-center justify-between rounded-xl border p-4 text-left transition-all hover:bg-neutral-50 dark:hover:bg-neutral-900 ${
+                      className={`flex items-center justify-between rounded-[2rem] border p-6 text-left transition-all hover:shadow-soft ${
                         field.value === font.id
-                            ? "border-primary-600 bg-primary-50 dark:bg-primary-900/10 ring-1 ring-primary-600"
-                            : "border-neutral-200 dark:border-neutral-800"
+                          ? "border-primary bg-primary/5 shadow-soft"
+                          : "border-neutral-100 bg-white"
                       }`}
                       onClick={() => field.onChange(font.id)}
                     >
-                      <span className="font-medium text-sm">{font.name}</span>
-                      {field.value === font.id && <span className="text-primary-600 font-bold">✓</span>}
+                      <span
+                        className={cn(
+                          "font-bold text-base",
+                          field.value === font.id
+                            ? "text-primary"
+                            : "text-neutral-900",
+                        )}
+                      >
+                        {font.name}
+                      </span>
+                      {field.value === font.id && (
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-sm">
+                          <span className="text-white font-bold text-sm">
+                            ✓
+                          </span>
+                        </div>
+                      )}
                     </button>
                   ))}
                 </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-tiny font-medium" />
             </FormItem>
           )}
         />
@@ -132,7 +175,9 @@ export function DesignForm({ onNext, onBack }: { onNext: () => void; onBack: () 
           name="layoutType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-base font-semibold">Disposition</FormLabel>
+              <FormLabel className="text-base font-semibold">
+                Disposition
+              </FormLabel>
               <FormControl>
                 <div className="grid grid-cols-2 gap-4">
                   <button
@@ -145,13 +190,15 @@ export function DesignForm({ onNext, onBack }: { onNext: () => void; onBack: () 
                     }`}
                   >
                     <div className="w-full aspect-video bg-white dark:bg-neutral-900 rounded border border-dashed border-neutral-300 dark:border-neutral-700 grid grid-cols-2 gap-1 p-1">
-                        <div className="bg-neutral-100 dark:bg-neutral-800 rounded col-span-1 row-span-2"></div>
-                        <div className="bg-neutral-100 dark:bg-neutral-800 rounded"></div>
-                        <div className="bg-neutral-100 dark:bg-neutral-800 rounded"></div>
+                      <div className="bg-neutral-100 dark:bg-neutral-800 rounded col-span-1 row-span-2"></div>
+                      <div className="bg-neutral-100 dark:bg-neutral-800 rounded"></div>
+                      <div className="bg-neutral-100 dark:bg-neutral-800 rounded"></div>
                     </div>
                     <div className="flex items-center justify-between w-full">
-                        <span className="font-medium text-sm">Bento Grid</span>
-                        {field.value === "bento" && <span className="text-primary-600">✓</span>}
+                      <span className="font-medium text-sm">Bento Grid</span>
+                      {field.value === "bento" && (
+                        <span className="text-primary-600">✓</span>
+                      )}
                     </div>
                   </button>
 
@@ -165,13 +212,15 @@ export function DesignForm({ onNext, onBack }: { onNext: () => void; onBack: () 
                     }`}
                   >
                     <div className="w-full aspect-video bg-white dark:bg-neutral-900 rounded border border-dashed border-neutral-300 dark:border-neutral-700 flex flex-col gap-1 p-1">
-                        <div className="bg-neutral-100 dark:bg-neutral-800 h-1/3 rounded w-full"></div>
-                        <div className="bg-neutral-100 dark:bg-neutral-800 h-1/3 rounded w-full"></div>
-                        <div className="bg-neutral-100 dark:bg-neutral-800 h-1/3 rounded w-full"></div>
+                      <div className="bg-neutral-100 dark:bg-neutral-800 h-1/3 rounded w-full"></div>
+                      <div className="bg-neutral-100 dark:bg-neutral-800 h-1/3 rounded w-full"></div>
+                      <div className="bg-neutral-100 dark:bg-neutral-800 h-1/3 rounded w-full"></div>
                     </div>
                     <div className="flex items-center justify-between w-full">
-                        <span className="font-medium text-sm">Liste Simple</span>
-                        {field.value === "list" && <span className="text-primary-600">✓</span>}
+                      <span className="font-medium text-sm">Liste Simple</span>
+                      {field.value === "list" && (
+                        <span className="text-primary-600">✓</span>
+                      )}
                     </div>
                   </button>
                 </div>
@@ -181,15 +230,20 @@ export function DesignForm({ onNext, onBack }: { onNext: () => void; onBack: () 
           )}
         />
 
-        {error && <div className="text-red-500 text-sm font-medium p-3 bg-red-50 rounded-lg">{error}</div>}
+        {error && (
+          <div className="text-red-500 text-sm font-medium p-3 bg-red-50 rounded-lg">
+            {error}
+          </div>
+        )}
 
-        <div className="flex gap-4 pt-4">
-            <Button type="button" variant="ghost" onClick={onBack} className="flex-1 h-12 rounded-xl" disabled={isLoading}>
-                Retour
-            </Button>
-            <Button type="submit" className="flex-[2] h-12 rounded-xl text-base font-bold" disabled={isLoading}>
-                {isLoading ? "Sauvegarde..." : "Continuer"}
-            </Button>
+        <div className="flex gap-4 pt-6">
+          <Button
+            type="submit"
+            className="w-full h-16 rounded-[2rem] text-lg font-bold shadow-soft-xl bg-neutral-900 hover:bg-neutral-800 text-white transition-all active:scale-[0.98]"
+            disabled={isLoading}
+          >
+            {isLoading ? "Sauvegarde..." : "Enregistrer les modifications"}
+          </Button>
         </div>
       </form>
     </Form>

@@ -1,64 +1,143 @@
 import { getProducts } from "@/app/actions/products";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Plus, Edit2 } from "lucide-react";
 import Link from "next/link";
+import {
+  Plus,
+  Package,
+  Database,
+  AlertCircle,
+  Trash2,
+  Edit2,
+  ExternalLink,
+} from "lucide-react";
+import { motion } from "framer-motion";
 import Image from "next/image";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 10 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 24 },
+  },
+};
 
 export default async function ProductsPage() {
   const products = await getProducts();
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Mes Produits</h1>
+      <header className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-[clamp(1.75rem,4vw,2.25rem)] font-bold tracking-tight text-neutral-900">
+            Mes Produits
+          </h1>
+          <p className="text-neutral-500 font-medium">
+            Gérez votre inventaire avec style
+          </p>
+        </div>
         <Link href="/products/new">
-          <Button size="icon" className="rounded-full h-12 w-12 shadow-lg">
-            <Plus className="h-6 w-6" />
+          <Button className="rounded-2xl h-14 px-6 shadow-soft-xl bg-neutral-900 text-white font-bold hover:bg-neutral-800 transition-all active:scale-[0.98]">
+            <Plus className="h-5 w-5 mr-2" />
+            <span className="hidden sm:inline">Ajouter</span>
           </Button>
         </Link>
       </header>
 
-      <div className="grid grid-cols-1 gap-4">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
         {products.length === 0 ? (
-          <div className="text-center py-20 text-neutral-400">
+          <div className="col-span-full text-center py-24 text-neutral-300 italic font-medium">
             Aucun produit pour le moment.
           </div>
         ) : (
           products.map((product) => (
-            <Card key={product.id} className="p-4 flex gap-4 overflow-hidden">
-              <div className="relative h-24 w-24 flex-shrink-0 bg-neutral-100 rounded-xl overflow-hidden">
-                <Image
-                  src={product.image_primary_url || "https://placehold.co/200x200"}
-                  alt={product.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex-1 flex flex-col justify-between py-1">
-                <div>
-                  <h3 className="font-semibold line-clamp-1">{product.title}</h3>
-                  <p className="text-sm text-neutral-500 font-medium">
-                    {Number(product.price_xaf).toLocaleString()} XAF
-                  </p>
+            <motion.div
+              key={product.id}
+              variants={itemVariants}
+              className="group relative flex flex-col bg-white rounded-[2.5rem] border border-white/60 shadow-soft hover:shadow-soft-lg transition-all duration-300"
+            >
+              <div className="relative aspect-square w-full bg-neutral-50 p-2 overflow-hidden rounded-t-[2.5rem]">
+                <div className="relative w-full h-full rounded-[2rem] overflow-hidden shadow-inner">
+                  <Image
+                    src={
+                      product.image_primary_url ||
+                      "https://placehold.co/400x400"
+                    }
+                    alt={product.title}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    product.stock_quantity > 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                  }`}>
-                    {product.stock_quantity > 0 ? `Stock: ${product.stock_quantity}` : "Rupture"}
+                {/* Status Badge */}
+                <div className="absolute top-4 right-4 z-10">
+                  <span
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-bold shadow-sm backdrop-blur-md",
+                      product.stock_quantity > 0
+                        ? "bg-white/80 text-green-600"
+                        : "bg-red-500/90 text-white",
+                    )}
+                  >
+                    {product.stock_quantity > 0
+                      ? `${product.stock_quantity} en stock`
+                      : "Rupture"}
                   </span>
-                  <Link href={`/products/${product.id}`}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-neutral-400">
-                      <Edit2 className="h-4 w-4" />
+                </div>
+              </div>
+
+              <div className="p-6 flex flex-col gap-4">
+                <div className="space-y-1">
+                  <h3 className="font-bold text-lg text-neutral-900 line-clamp-1">
+                    {product.title}
+                  </h3>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl font-black text-neutral-900">
+                      {Number(product.price_xaf).toLocaleString()}
+                    </span>
+                    <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
+                      XAF
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <Link href={`/products/${product.id}`} className="flex-1">
+                    <Button
+                      variant="outline"
+                      className="w-full h-11 rounded-2xl border-neutral-100 hover:bg-neutral-50 font-bold text-sm text-neutral-600"
+                    >
+                      Modifier
                     </Button>
                   </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-11 w-11 rounded-2xl text-red-400 hover:text-red-500 hover:bg-red-50"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-            </Card>
+            </motion.div>
           ))
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }
