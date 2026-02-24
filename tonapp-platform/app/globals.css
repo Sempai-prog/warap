@@ -78,6 +78,22 @@
 
   /* Radius (Large & Friendly) */
   --radius-3xl: 1.5rem; /* ~24px */
+  --radius-4xl: 2rem;   /* ~32px */
+  --radius-5xl: 3rem;   /* ~48px */
+
+  /* Soft UI / Neumorphism Tokens */
+  --color-soft-bg: #F2F4F7;
+  --color-mint-card: #E0F4EE;
+  --color-mint-text: #2A9D8F;
+  --color-blue-card: #EBF5FF;
+  --color-blue-text: #3182CE;
+  --color-purple-card: #F5F3FF;
+  --color-purple-text: #7C3AED;
+
+  /* Shadows */
+  --shadow-soft: 0 10px 40px rgba(0,0,0,0.03);
+  --shadow-soft-lg: 0 20px 60px rgba(0,0,0,0.06);
+  --shadow-soft-xl: 0 25px 80px rgba(0,0,0,0.08);
 }
 
 :root {
