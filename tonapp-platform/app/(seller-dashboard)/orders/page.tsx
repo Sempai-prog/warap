@@ -1,28 +1,10 @@
+```
 import { getOrders } from "@/app/actions/orders";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
+import { MotionContainer, MotionItem } from "@/components/motion/MotionWrapper";
 import { ShoppingBag, Clock, Truck, CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, x: -10 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { type: "spring", stiffness: 300, damping: 24 },
-  },
-};
 
 export default async function OrdersPage({
   searchParams,
@@ -71,19 +53,14 @@ export default async function OrdersPage({
         ))}
       </div>
 
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="space-y-4"
-      >
+      <MotionContainer className="space-y-4">
         {orders.length === 0 ? (
           <div className="text-center py-24 text-neutral-300 italic font-medium">
             Aucune commande dans cet onglet.
           </div>
         ) : (
           orders.map((order) => (
-            <motion.div key={order.id} variants={itemVariants}>
+            <MotionItem key={order.id}>
               <Link href={`/orders/${order.id}`}>
                 <div className="group p-6 bg-white rounded-[2.5rem] border border-white/60 shadow-soft hover:shadow-soft-lg active:scale-[0.99] transition-all relative overflow-hidden">
                   <div className="flex justify-between items-start mb-4">
@@ -145,10 +122,10 @@ export default async function OrdersPage({
                   <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
                 </div>
               </Link>
-            </motion.div>
+            </MotionItem>
           ))
         )}
-      </motion.div>
+      </MotionContainer>
     </div>
   );
 }

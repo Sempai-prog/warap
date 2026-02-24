@@ -1,37 +1,11 @@
 import { getProducts } from "@/app/actions/products";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  Plus,
-  Package,
-  Database,
-  AlertCircle,
-  Trash2,
-  Edit2,
-  ExternalLink,
-} from "lucide-react";
-import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { MotionContainer, MotionItem } from "@/components/motion/MotionWrapper";
+import { Plus, Package, Edit2 } from "lucide-react";
 import Image from "next/image";
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 10 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 300, damping: 24 },
-  },
-};
+import { cn } from "@/lib/utils"; // Assuming cn is imported from here or similar
 
 export default async function ProductsPage() {
   const products = await getProducts();
@@ -55,23 +29,26 @@ export default async function ProductsPage() {
         </Link>
       </header>
 
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
+      {/* Grid des Produits Soft UI */}
+      <MotionContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.length === 0 ? (
-          <div className="col-span-full text-center py-24 text-neutral-300 italic font-medium">
-            Aucun produit pour le moment.
+          <div className="col-span-full py-20 text-center text-neutral-400 bg-white rounded-[2.5rem] border border-dashed border-neutral-200">
+            <Package
+              size={48}
+              className="mx-auto mb-4 opacity-50 text-neutral-300"
+            />
+            <p className="font-bold text-lg text-neutral-500">Aucun produit</p>
+            <p className="text-sm mt-1">
+              Commencez par ajouter votre premier produit.
+            </p>
           </div>
         ) : (
           products.map((product) => (
-            <motion.div
+            <MotionItem
               key={product.id}
-              variants={itemVariants}
               className="group relative flex flex-col bg-white rounded-[2.5rem] border border-white/60 shadow-soft hover:shadow-soft-lg transition-all duration-300"
             >
+              {/* Product Image Zone */}
               <div className="relative aspect-square w-full bg-neutral-50 p-2 overflow-hidden rounded-t-[2.5rem]">
                 <div className="relative w-full h-full rounded-[2rem] overflow-hidden shadow-inner">
                   <Image
@@ -134,10 +111,10 @@ export default async function ProductsPage() {
                   </Button>
                 </div>
               </div>
-            </motion.div>
+            </MotionItem>
           ))
         )}
-      </motion.div>
+      </MotionContainer>
     </div>
   );
 }

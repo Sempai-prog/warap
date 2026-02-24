@@ -1,27 +1,8 @@
 import { getDashboardMetrics } from "@/app/actions/dashboard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { MotionContainer, MotionItem } from "@/components/motion/MotionWrapper";
 import { TrendingUp, ShoppingBag, ArrowRight, User } from "lucide-react";
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 300, damping: 24 },
-  },
-};
 
 interface DashboardOrder {
   id: string;
@@ -38,12 +19,7 @@ export default async function DashboardPage() {
   if (!metrics) return <div>Chargement...</div>;
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-8"
-    >
+    <MotionContainer className="space-y-8">
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-black tracking-tight text-neutral-900 leading-tight">
@@ -59,7 +35,7 @@ export default async function DashboardPage() {
       </header>
 
       <div className="grid grid-cols-2 gap-4">
-        <motion.div variants={itemVariants}>
+        <MotionItem>
           <div className="p-6 bg-neutral-900 rounded-[2.5rem] shadow-soft-xl text-white relative overflow-hidden group">
             <div className="relative z-10">
               <div className="flex items-center gap-2 text-white/60 text-[10px] font-black uppercase tracking-widest mb-4">
@@ -75,9 +51,9 @@ export default async function DashboardPage() {
             </div>
             <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-colors" />
           </div>
-        </motion.div>
+        </MotionItem>
 
-        <motion.div variants={itemVariants}>
+        <MotionItem>
           <div className="p-6 bg-white rounded-[2.5rem] shadow-soft border border-white/60 text-neutral-900 relative overflow-hidden group">
             <div className="relative z-10">
               <div className="flex items-center gap-2 text-neutral-400 text-[10px] font-black uppercase tracking-widest mb-4">
@@ -92,10 +68,10 @@ export default async function DashboardPage() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </MotionItem>
       </div>
 
-      <motion.section variants={itemVariants} className="space-y-6">
+      <MotionContainer className="space-y-6">
         <div className="flex items-center justify-between px-2">
           <h2 className="text-2xl font-black text-neutral-900 tracking-tight">
             Récent
@@ -146,7 +122,7 @@ export default async function DashboardPage() {
             ))
           )}
         </div>
-      </motion.section>
-    </motion.div>
+      </MotionContainer>
+    </MotionContainer>
   );
 }
